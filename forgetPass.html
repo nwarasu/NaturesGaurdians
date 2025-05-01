@@ -1,0 +1,36 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="forgetPass.css">
+    <title>Forgot Password</title>
+    <script>
+        function validateEmail() {
+            const emailInput = document.getElementById('email');
+            if (!emailInput.value) {
+                alert('Please enter your email.');
+                return false; // Prevent form submission
+            }
+            return true; // Allow form submission
+        }
+    </script>
+</head>
+<body>
+    <div class="foegetPass-container">
+        <div class="form-section">
+            <h1>Forgot Password</h1>
+            <p>Enter your email for the verification process, we will send a 4 digits code to your email.</p>
+            <form onsubmit="return validateEmail()" action="verification.html">
+                <input type="email" id="email" placeholder="Enter email" required>
+                <button type="submit" class="continue-button">CONTINUE</button>
+            </form>
+        </div>
+        <div class="image-section">
+            <img src="images/NG.PNG" alt="Nature's Guardians" class="animal-image">
+        </div>
+    </div>
+</body>
+</html>

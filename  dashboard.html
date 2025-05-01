@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Overview</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            min-height: 100vh;
+        }
+
+        .sidebar-nav {
+            width: 100%;
+            background: #d2b48c;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            height: 80px;
+        }
+
+        .left-section, .right-section {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .center-section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 35px;
+            flex: 1;
+            transform: translateX(-15px);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 10px;
+            color: #333;
+            text-align: center;
+            position: relative;
+        }
+
+        .nav-item button {
+            width: 45px;
+            height: 45px;
+            background-size: cover;
+            background-position: center;
+            border: none;
+            cursor: pointer;
+            background-color: transparent;
+            margin-bottom: 5px;
+        }
+
+        /* HOME button - bigger */
+        .btn1 {
+            background-image: url('images/button1.png');
+            width: 120px;
+            height: 120px;
+            margin-top: 0px;
+        }
+
+        /* Other buttons */
+        .btn2 { background-image: url('images/projectsbutton.png'); }
+        .btn3 { background-image: url('images/researchbutton.png'); }
+        .btn4 { background-image: url('images/commentbutton.png'); }
+        .btn5 { background-image: url('images/interactbutton.png'); }
+        .btn6 { background-image: url('images/camerabutton.png'); }
+
+        /* Account Icon */
+        .account-icon {
+            background-image: url('images/accountbutton.png');
+            width: 45px;
+            height: 45px;
+            background-size: cover;
+            background-position: center;
+            border: none;
+            background-color: transparent;
+            cursor: pointer;
+            margin-bottom: 5px;
+        }
+
+        .tooltip {
+            visibility: hidden;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 5px;
+            padding: 5px 8px;
+            position: absolute;
+            bottom: 110%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            white-space: nowrap;
+            font-size: 12px;
+            z-index: 999;
+        }
+
+        .nav-item:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .account-item {
+            position: relative;
+        }
+
+        .account-dropdown {
+            display: none;
+            position: absolute;
+            left: 0;
+            top: 60px;
+            background-color: white;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+            z-index: 1;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .account-dropdown a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            font-size: 14px;
+        }
+
+        .account-dropdown a:hover {
+            background-color: #ddd;
+        }
+
+        .account-item:hover .account-dropdown {
+            display: block;
+        }
+
+        .main-container {
+            display: flex;
+            margin-top: 80px; /* Matches the height of the navbar */
+            height: calc(100vh - 80px);
+        }
+
+        .dashboard-sidebar {
+            width: 200px;
+            background: white;
+            padding: 20px;
+            height: 100%;
+            position: fixed;
+            overflow-y: auto;
+        }
+
+        .dashboard-sidebar ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .dashboard-sidebar ul li {
+            margin: 10px 0;
+        }
+
+        .dashboard-sidebar ul li a {
+            text-decoration: none;
+            color: black;
+            font-weight: bold;
+        }
+
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+            margin-left: 240px; /* Sidebar width + padding */
+            overflow-y: auto;
+            height: 100%;
+        }
+
+        .card {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .chart-container {
+            width: 100%;
+            height: 200px;
+            max-width: 600px;
+            margin: auto;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            width: 80%;
+            max-width: 600px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+        }
+
+        /* Footer Styles */
+        footer {
+            background-color: #d2b48c;
+            color: black;
+            padding: 20px 0;
+            font-family: Arial, sans-serif;
+            position: relative;
+            clear: both;
+            margin-top: auto;
+        }
+
+        .footer-container {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        .footer-container div {
+            flex: 1 1 200px;
+            margin: 10px;
+        }
+
+        .footer-container h4 {
+            margin-bottom: 10px;
+        }
+
+        .footer-container ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .footer-container li {
+            margin: 5px 0;
+        }
+
+        .footer-container a {
+            color: black;
+            text-decoration: none;
+        }
+
+        .footer-container a:hover {
+            text-decoration: underline;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.8em;
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <div class="sidebar-nav">
+        <div class="left-section">
+            <div class="nav-item">
+                <a href="home.html">
+                    <button class="btn1" title="HOME"></button>
+                </a>
+                <div class="tooltip">HOME</div>
+                HOME
+            </div>
+            <div class="nav-item account-item">
+                <button class="account-icon" title="ACCOUNT"></button>
+                <div class="tooltip">ACCOUNT</div>
+                ACCOUNT
+                <div class="account-dropdown">
+                    <a href="EDITPROFILE.html">Edit Account</a>
+                    <a href="Signin-upWithoutGA.html">Sign In</a>
+                    <a href="signup.html">Sign Up</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="center-section nav-icons">
+            <div class="nav-item">
+                <a href="learn.html">
+                    <button class="btn2" title="PROJECTS"></button>
+                </a>
+                <div class="tooltip">PROJECTS</div>
+                PROJECTS
+            </div>
+            <div class="nav-item">
+                <a href="paricipation2.html">
+                    <button class="btn3" title="SCIENTIFIC RESEARCH PARTICIPATION"></button>
+                </a>
+                <div class="tooltip">RESEARCH</div>
+                RESEARCH
+            </div>
+            <div class="nav-item">
+                <a href="ward.html">
+                    <button class="btn4" title="FEEDBACK AND REPORTS"></button>
+                </a>
+                <div class="tooltip">FEEDBACK</div>
+                FEEDBACK
+            </div>
+            <div class="nav-item">
+                <a href="index.html">
+                    <button class="btn5" title="INTERACT WITH OTHERS"></button>
+                </a>
+                <div class="tooltip">INTERACT</div>
+                INTERACT
+            </div>
+            <div class="nav-item">
+                <a href="speciesID.html">
+                    <button class="btn6" title="IMAGE UPLOAD"></button>
+                </a>
+                <div class="tooltip">UPLOAD</div>
+                UPLOAD
+            </div>
+        </div>
+
+        <div class="right-section">
+            <!-- EMPTY for now -->
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="dashboard-sidebar">
+            <h2>Dashboard</h2>
+            <ul>
+                <li><a href="home.html">Website</a></li>
+                <li><a href="dashboard.html">Overview</a></li>
+                <li><a href="userAcc.html">User Accounts</a></li>
+            </ul>
+        </div>
+        <div class="content">
+            <h1>Overview</h1>
+            <div class="grid">
+                <div class="card">Unresolved <h2>60</h2></div>
+                <div class="card" style="color: green;">Overdue <h2>16</h2></div>
+                <div class="card">Open <h2>43</h2></div>
+                <div class="card">On hold <h2>64</h2></div>
+            </div>
+            <div class="card">
+                <h3>Today's Trends</h3>
+                <div class="chart-container">
+                    <canvas id="trendChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-container">
+            <div class="eec-info">
+                <h4>Nature's Guardians Info</h4>
+                <ul>
+                    <li><a href="#" id="aboutUsLink">About Us</a></li>
+                </ul>
+            </div>
+            <div class="Quick Links">
+                <h4>Quick Links:</h4>
+                <ul>
+                    <li><a href="#" id="termsLink">Terms of Service</a></li>
+                    <li><a href="mailto:nature'sGaurdian2025@gmail.com">Contact Us</a></li>
+                    <li><a href="#" id="privacyLink">Privacy Policy</a></li>
+                </ul>
+            </div>
+            <div class="social">
+                <h4>Social</h4>
+                <ul>
+                    <li><a href="https://instagram.com/NATURESGUARDIANSS" target="_blank">@NaturesGuardianss</a></li>
+                    <li>Follow us on Social Media!</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Nature's Guardians. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- The Terms Modal -->
+    <div id="termsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeTerms">&times;</span>
+            <h1>Terms of Service</h1>
+        <h2>1. Introduction</h2>
+        <p>These Terms govern your use of the "Nature's Guardians" platform. By using our services, you agree to comply with these terms.</p>
+        <h2>2. User Responsibilities</h2>
+        <p>Users must be at least 13 years old to use the platform. If you are under 18, you need parental consent.</p>
+        <h2>3. Data Usage</h2>
+        <p>Users can upload images of wildlife for identification. By uploading images, you grant us permission to use this data solely to improve our model.</p>
+        <h2>4. Content Ownership</h2>
+        <p>All content on the platform is the exclusive property of Nature's Guardians.</p>
+        <h2>5. Model Limitations</h2>
+        <p>The model's predictions are not guaranteed to be accurate.</p>
+        <h2>6. Conservation Awareness</h2>
+        <p>The platform may include educational content about each species' conservation status.</p>
+        <h2>7. Modifications to Terms</h2>
+        <p>Nature's Guardians reserves the right to modify these Terms at any time.</p>
+        <h2>8. Limitation of Liability</h2>
+        <p>Nature's Guardians shall not be liable for any damages arising from the use of the platform.</p>
+        <h2>9. Contact Information</h2>
+        <p>For any questions, please contact us at NaturesGuardians1@gmail.com.</p>
+    </div>
+</div>
+
+    <!-- The Privacy Policy Modal -->
+    <div id="privacyModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closePrivacy">&times;</span>
+            <h1>Privacy Policy</h1>
+            <h2>1. Information Collection</h2>
+            <p>We collect personal information when users register and upload images.</p>
+            <h2>2. Data Protection</h2>
+            <p>We implement security measures to protect your personal information.</p>
+            <h2>3. User Rights</h2>
+            <p>Users have the right to access, correct, or delete their personal information.</p>
+            <h2>4. Changes to Privacy Policy</h2>
+            <p>Nature's Guardians reserves the right to modify this Privacy Policy at any time.</p>
+            <h2>5. Third-Party Services</h2>
+            <p>Our platform may contain links to third-party websites.</p>
+            <h2>6. Cookies and Tracking Technologies</h2>
+            <p>We may use cookies to enhance user experience.</p>
+            <h2>7. Contact Information</h2>
+            <p>If you have any questions regarding this Privacy Policy, please contact us.</p>
+        </div>
+    </div>
+
+    <!-- The About Us Modal -->
+    <div id="aboutUsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeAboutUs">&times;</span>
+        <h1>About Us</h1>
+        <p>Welcome to Nature's Guardians, a dedicated platform aimed at promoting wildlife conservation and raising awareness about endangered species. Our mission is to harness the power of technology to classify and protect our planet's diverse wildlife.</p>
+        
+        <h3>Our Mission</h3>
+        <p>We strive to utilize advanced machine learning techniques to provide accurate identification of endangered species from images. By doing so, we hope to empower individuals and organizations to take action in conservation efforts.</p>
+        
+        <h3>Our Vision</h3>
+        <p>We envision a world where every individual is aware of the importance of biodiversity and actively participates in conservation initiatives. Through education and engagement, we aim to inspire a collective effort to protect our planet's wildlife.</p>
+        
+        <h3>Our Values</h3>
+        <ul>
+            <li><strong>Integrity:</strong> We uphold the highest ethical standards in our work.</li>
+            <li><strong>Innovation:</strong> We embrace new technologies and ideas to enhance our impact.</li>
+            <li><strong>Collaboration:</strong> We believe in partnerships that drive effective conservation solutions.</li>
+            <li><strong>Education:</strong> We are committed to raising awareness about wildlife conservation.</li>
+        </ul>
+        
+        <p>Join us on our journey to protect the planet's wildlife. Together, we can make a difference!</p>
+    </div>
+    </div>
+
+    <script>
+        // Modal functionality for Terms
+        const termsModal = document.getElementById("termsModal");
+        const termsLink = document.getElementById("termsLink");
+        const closeTermsBtn = document.getElementById("closeTerms");
+
+        termsLink.onclick = function() {
+            termsModal.style.display = "block";
+        }
+
+        closeTermsBtn.onclick = function() {
+            termsModal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == termsModal) {
+                termsModal.style.display = "none";
+            }
+        }
+
+        // Modal functionality for Privacy Policy
+        const privacyModal = document.getElementById("privacyModal");
+        const privacyLink = document.getElementById("privacyLink");
+        const closePrivacyBtn = document.getElementById("closePrivacy");
+
+        privacyLink.onclick = function() {
+            privacyModal.style.display = "block";
+        }
+
+        closePrivacyBtn.onclick = function() {
+            privacyModal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == privacyModal) {
+                privacyModal.style.display = "none";
+            }
+        }
+
+        // Modal functionality for About Us
+        const aboutUsModal = document.getElementById("aboutUsModal");
+        const aboutUsLink = document.getElementById("aboutUsLink");
+        const closeAboutUsBtn = document.getElementById("closeAboutUs");
+
+        aboutUsLink.onclick = function() {
+            aboutUsModal.style.display = "block";
+        }
+
+        closeAboutUsBtn.onclick = function() {
+            aboutUsModal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == aboutUsModal) {
+                aboutUsModal.style.display = "none";
+            }
+        }
+
+        // Chart.js setup
+        var ctx = document.getElementById('trendChart').getContext('2d');
+        var trendChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ["0", "2", "4", "6", "8", "10", "12", "14", "16"],
+                datasets: [{
+                    label: 'Today',
+                    data: [10, 15, 25, 20, 30, 45, 38, 50, 42],
+                    borderColor: 'green',
+                    fill: false
+                }, {
+                    label: 'Yesterday',
+                    data: [5, 8, 12, 15, 18, 25, 22, 28, 30],
+                    borderColor: 'gray',
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    </script>
+</body>
+</html>

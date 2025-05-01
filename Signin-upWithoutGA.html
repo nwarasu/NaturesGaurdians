@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login & Signup Form</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      font-size: 16px;
+      background-color: #f9f9f9;
+    }
+    .container {
+      display: flex;
+      width: 80%;
+      max-width: 800px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+    }
+    .form-section {
+      flex: 1;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+    }
+    h1, h2 {
+      margin-bottom: 20px;
+      text-align: left;
+      font-size: 24px;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      margin-bottom: 5px;
+      font-weight: bold;
+      display: block;
+    }
+    input[type="email"],
+    input[type="password"],
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    button {
+      padding: 10px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 10px;
+      width: 100%;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+    .login-footer, .signup-footer {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .image-section {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    img {
+      max-width: 400px;
+      height: auto;
+    }
+    .warning {
+      color: red;
+      font-size: 12px;
+      margin-top: 5px;
+    }
+    .forgot-password {
+      text-align: right;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="form-section" id="login-form-section">
+      <h2>Welcome back!</h2>
+      <h5>Enter your Credentials to access your account</h5>
+      <form id="login-form">
+        <div class="form-group">
+          <label for="email">Email address</label>
+          <input type="email" id="email" name="email" placeholder="Enter your email" required />
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="Enter your password" required />
+          <div class="forgot-password">
+            <a href="forgetPass.html">Forget Password?</a>
+          </div>
+        </div>
+        <div class="terms-group">
+          <input type="checkbox" id="remember" name="remember" />
+          <label for="remember">Remember for 30 days</label>
+        </div>
+        <!-- Updated login button without <a> -->
+        <button type="submit">Login</button>
+        <div class="login-footer">
+          <p>Don't have an account? <a href="#" onclick="toggleForms()">Sign Up</a></p>
+        </div>
+      </form>
+    </div>
+
+    <div class="form-section" id="signup-form-section" style="display: none;">
+      <h1>Get Started Now</h1>
+      <form id="signup-form">
+        <div class="form-group">
+          <label for="name">Enter your name</label>
+          <input type="text" id="name" name="name" placeholder="Enter your name" required />
+        </div>
+        <div class="form-group">
+          <label for="signup-email">Email address</label>
+          <input type="email" id="signup-email" name="email" placeholder="Enter your email" required />
+          <small id="email-warning" class="warning" style="display: none;">Invalid email format. Please enter a valid email (e.g., user@example.com).</small>
+        </div>
+        <div class="form-group">
+          <label for="signup-password">Password</label>
+          <input type="password" id="signup-password" name="password" placeholder="Enter your password" required />
+          <small id="password-warning" class="warning" style="display: none;">Password must be at least 8 characters long and include letters and numbers.</small>
+        </div>
+        <div class="terms-group">
+          <input type="checkbox" id="terms" name="terms" required />
+          <label for="terms">I agree to the <a href="Terms.html">terms & policy</a></label>
+        </div>
+        <button type="submit">Signup</button>
+        <div class="signup-footer">
+          <p>Have an account? <a href="#" onclick="toggleForms()">Sign In</a></p>
+        </div>
+      </form>
+    </div>
+
+    <div class="image-section">
+      <img src="/images/NG.PNG" alt="Nature's Guardians Logo" />
+    </div>
+  </div>
+
+  <script>
+    const loginForm = document.getElementById('login-form');
+    const signupForm = document.getElementById('signup-form');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const signupEmailInput = document.getElementById('signup-email');
+    const signupPasswordInput = document.getElementById('signup-password');
+    const emailWarning = document.getElementById('email-warning');
+    const passwordWarning = document.getElementById('password-warning');
+
+    loginForm.addEventListener('submit', function(event) {
+      event.preventDefault();
+      let valid = true;
+
+      const emailPattern = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
+      if (!emailPattern.test(emailInput.value)) {
+        alert("Invalid email format. Please enter a valid email.");
+        valid = false;
+      }
+
+      if (passwordInput.value.length < 8) {
+        alert("Password must be at least 8 characters long.");
+        valid = false;
+      }
+
+      if (valid) {
+        // Redirect to home.html on successful login
+        window.location.href = "home.html";
+      }
+    });
+
+    signupForm.addEventListener('submit', function(event) {
+      let valid = true;
+
+      emailWarning.style.display = 'none';
+      passwordWarning.style.display = 'none';
+
+      const emailPattern = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
+      if (!emailPattern.test(signupEmailInput.value)) {
+        emailWarning.style.display = 'block';
+        valid = false;
+      }
+
+      if (signupPasswordInput.value.length < 8) {
+        passwordWarning.innerText = "Password must be at least 8 characters long containing upper-lower cases.";
+        passwordWarning.style.display = 'block';
+        valid = false;
+      } else if (
+        signupPasswordInput.value.trim() === '' ||
+        !/[a-zA-Z]/.test(signupPasswordInput.value) ||
+        !/[0-9]/.test(signupPasswordInput.value)
+      ) {
+        passwordWarning.innerText = "Password must include letters and numbers.";
+        passwordWarning.style.display = 'block';
+        valid = false;
+      }
+
+      if (!valid) {
+        event.preventDefault();
+      }
+    });
+
+    function toggleForms() {
+      const loginFormSection = document.getElementById('login-form-section');
+      const signupFormSection = document.getElementById('signup-form-section');
+      if (loginFormSection.style.display === "none") {
+        loginFormSection.style.display = "flex";
+        signupFormSection.style.display = "none";
+      } else {
+        loginFormSection.style.display = "none";
+        signupFormSection.style.display = "flex";
+      }
+    }
+  </script>
+</body>
+</html>

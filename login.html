@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet"/>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f8f9fa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      width: 350px;
+    }
+    h2 {
+      color: #333;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-top: 8px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+    .input-group {
+      position: relative;
+      text-align: left;
+      margin-bottom: 20px;
+    }
+    .input-group label {
+      font-size: 14px;
+      color: #555;
+    }
+    .input-group i {
+      position: absolute;
+      right: 12px;
+      top: 40px;
+      cursor: pointer;
+      color: #777;
+    }
+    .login-btn {
+      background: #28a745;
+      color: white;
+      padding: 12px;
+      width: 100%;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: 0.3s;
+    }
+    .login-btn:hover {
+      background: #1e7e34;
+    }
+    .bottom-text {
+      margin-top: 15px;
+      font-size: 14px;
+    }
+    .bottom-text a {
+      color: #007bff;
+      text-decoration: none;
+    }
+    .bottom-text a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Admin Login</h2>
+    <form id="login-form">
+      <div class="input-group">
+        <label>Email</label>
+        <input type="email" id="email" required placeholder="Enter your email" />
+      </div>
+      <div class="input-group">
+        <label>Password</label>
+        <input type="password" id="password" required placeholder="Enter your password" />
+        <i onclick="togglePassword()" id="togglePassword">👁️</i>
+      </div>
+      <button type="submit" class="login-btn">Log In</button>
+    </form>
+    <div class="bottom-text">
+      Don't have an account? <a href="signup.html">Sign up</a>
+    </div>
+    <div class="bottom-text">
+      <a href="home.html">⬅ Get Back to the Website</a>
+    </div>
+  </div>
+
+  <script>
+    function togglePassword() {
+      var passwordInput = document.getElementById("password");
+      var toggleIcon = document.getElementById("togglePassword");
+      if (passwordInput.type === "password") {
+        passwordInput.type = "text";
+        toggleIcon.textContent = "🔒";
+      } else {
+        passwordInput.type = "password";
+        toggleIcon.textContent = "👁️";
+      }
+    }
+
+    document.getElementById("login-form").addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      try {
+        const response = await fetch("http://localhost:3000/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ email, password })
+        });
+
+        const result = await response.json();
+        if (result.success) {
+          window.location.href = "dashboard.html";
+        } else {
+          alert("Login failed: " + result.message);
+        }
+      } catch (error) {
+        alert("Error: " + error.message);
+      }
+    });
+  </script>
+</body>
+</html>

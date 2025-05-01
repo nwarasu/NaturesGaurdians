@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Dashboard</title>
+    <style>
+        /* Basic Reset */
+        * {
+          box-sizing: border-box;
+          margin: 0;
+          padding: 0;
+        }
+
+        /* Top Navigation Bar */
+        .sidebar {
+          width: 100%;
+          background: #d2b48c;
+          padding: 10px 20px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          position: fixed;
+          top: 0;
+          left: 0;
+          z-index: 1000;
+        }
+
+        /* Left and Right Sections */
+        .left-section, .right-section {
+          display: flex;
+          gap: 20px;
+          align-items: center;
+        }
+
+        /* Center Section */
+        .center-section {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 35px;
+          flex: 1;
+          transform: translateX(-15px);
+        }
+
+        /* Navigation Item */
+        .nav-item {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          font-size: 10px;
+          color: #333;
+          text-align: center;
+          position: relative;
+        }
+
+        .nav-item button {
+          width: 45px;
+          height: 45px;
+          background-size: cover;
+          background-position: center;
+          border: none;
+          cursor: pointer;
+          background-color: transparent;
+          margin-bottom: 5px;
+        }
+
+        /* Button Images */
+        .btn1 {
+          background-image: url('images/button1.png');
+          width: 120px;
+          height: 120px;
+        }
+
+        .btn2 { background-image: url('images/projectsbutton.png'); }
+        .btn3 { background-image: url('images/researchbutton.png'); }
+        .btn4 { background-image: url('images/commentbutton.png'); }
+        .btn5 { background-image: url('images/interactbutton.png'); }
+        .btn6 { background-image: url('images/camerabutton.png'); }
+
+        /* Account Icon */
+        .account-icon {
+          background-image: url('images/accountbutton.png');
+          width: 45px;
+          height: 45px;
+          background-size: cover;
+          background-position: center;
+          border: none;
+          background-color: transparent;
+          cursor: pointer;
+          margin-bottom: 5px;
+        }
+
+        /* Tooltip */
+        .tooltip {
+          visibility: hidden;
+          background-color: #333;
+          color: #fff;
+          text-align: center;
+          border-radius: 5px;
+          padding: 5px 8px;
+          position: absolute;
+          bottom: 110%;
+          left: 50%;
+          transform: translateX(-50%);
+          opacity: 0;
+          transition: opacity 0.3s;
+          white-space: nowrap;
+          font-size: 12px;
+          z-index: 999;
+        }
+
+        .nav-item:hover .tooltip {
+          visibility: visible;
+          opacity: 1;
+        }
+
+        /* Account Dropdown */
+        .account-item {
+          position: relative;
+        }
+
+        .account-dropdown {
+          display: none;
+          position: absolute;
+          left: 0;
+          top: 60px;
+          background-color: white;
+          min-width: 160px;
+          box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+          z-index: 1;
+          border-radius: 5px;
+          overflow: hidden;
+        }
+
+        .account-dropdown a {
+          color: black;
+          padding: 12px 16px;
+          text-decoration: none;
+          display: block;
+          font-size: 14px;
+        }
+
+        .account-dropdown a:hover {
+          background-color: #ddd;
+        }
+
+        .account-item:hover .account-dropdown {
+          display: block;
+        }
+
+        /* CSS styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            display: flex;
+        }
+
+        .content {
+            margin-left: 10;
+            padding-left: 10px;
+            padding-right: 10px;
+            padding-top: 10px;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+            box-sizing: border-box;
+            margin-top: 80px; /* Added this line to fix navbar overlap */
+        }
+
+        .header {
+            display: flex;
+            justify-content: flex-end; /* Align items to the right */
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .projects {
+            margin-top: 20px;
+        }
+
+        .project-board {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .column {
+            background: #eaeaea;
+            border-radius: 5px;
+            padding: 10px;
+            width: 30%;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            position: relative; /* For positioning the popup */
+        }
+
+        h3 {
+            text-align: center;
+        }
+
+        .task {
+            background: white;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            position: relative; /* For positioning the button */
+        }
+
+        .progress-container {
+            background: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .progress-bar {
+            height: 8px;
+            transition: width 0.4s ease;
+        }
+
+        .project-count {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .due-date {
+            color: red; /* Style for the due date */
+            font-weight: bold; /* Optional: make it bold */
+            text-align: center; /* Center the due date */
+            margin-top: 5px; /* Space between progress bar and date */
+        }
+
+        .task-count {
+            text-align: right; /* Align task count to the right */
+            font-weight: bold;
+            margin-bottom: 5px; /* Space between count and progress bar */
+        }
+
+        .dots-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 20px; /* Adjust size of dots */
+        }
+
+        .popup {
+            display: none;
+            position: absolute;
+            top: 30px;
+            right: 10px;
+            background: white;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+        }
+
+        .popup.active {
+            display: block;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1000; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0, 0, 0, 0.5); /* Black w/ opacity */
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 15% auto; /* Center modal */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            width: 80%; /* Responsive width */
+            max-width: 600px; /* Max width for large screens */
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+        }
+
+        /* Footer Styles */
+        footer { 
+            background-color: #d2b48c;
+            color: black; 
+            padding: 20px 0;
+            font-family: Arial, sans-serif;
+            position: relative; 
+            clear: both;
+        }
+
+        .footer-container {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            max-width: 1200px; 
+            margin: auto;
+        }
+
+        .footer-container div {
+            flex: 1 1 200px; /* Allow flexibility for small screens */
+            margin: 10px;
+        }
+
+        .footer-container h4 {
+            margin-bottom: 10px;
+        }
+
+        .footer-container ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .footer-container li {
+            margin: 5px 0;
+        }
+
+        .footer-container a {
+            color: black;
+            text-decoration: none;
+        }
+
+        .footer-container a:hover {
+            text-decoration: underline;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.8em;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Top Navigation Bar -->
+<div class="sidebar">
+  <div class="left-section">
+    <div class="nav-item">
+      <a href="home.html">
+        <button class="btn1" title="HOME"></button>
+      </a>
+      <div class="tooltip">HOME</div>
+      HOME
+    </div>
+    <div class="nav-item account-item">
+      <button class="account-icon" title="ACCOUNT"></button>
+      <div class="tooltip">ACCOUNT</div>
+      ACCOUNT
+      <div class="account-dropdown">
+        <a href="EDITPROFILE.html">Edit Account</a>
+        <a href="Signin-upWithoutGA.html">Sign In</a>
+        <a href="signup.html">Sign Up</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="center-section nav-icons">
+    <div class="nav-item">
+      <a href="learn.html">
+        <button class="btn2" title="PROJECTS"></button>
+      </a>
+      <div class="tooltip">PROJECTS</div>
+      PROJECTS
+    </div>
+    <div class="nav-item">
+      <a href="paricipation2.html">
+        <button class="btn3" title="RESEARCH"></button>
+      </a>
+      <div class="tooltip">RESEARCH</div>
+      RESEARCH
+    </div>
+    <div class="nav-item">
+      <a href="ward.html">
+        <button class="btn4" title="FEEDBACK"></button>
+      </a>
+      <div class="tooltip">FEEDBACK</div>
+      FEEDBACK
+    </div>
+    <div class="nav-item">
+      <a href="index.html">
+        <button class="btn5" title="INTERACT"></button>
+      </a>
+      <div class="tooltip">INTERACT</div>
+      INTERACT
+    </div>
+    <div class="nav-item">
+      <a href="speciesID.html">
+        <button class="btn6" title="UPLOAD"></button>
+      </a>
+      <div class="tooltip">UPLOAD</div>
+      UPLOAD
+    </div>
+  </div>
+
+  <div class="right-section">
+    <!-- Empty - you can add more buttons if needed -->
+  </div>
+</div>
+
+
+<div class="content">
+    <div class="container">
+        <section>
+            <div class="projects">
+                <h2>Projects</h2>
+                <div class="project-board">
+                    <div class="column">
+                        <h3>To Do</h3>
+                        <div class="project-count">4 Projects</div>
+
+                        <div class="task">
+                            <h4>Video Lessons</h4>
+                            <button class="dots-button" onclick="togglePopup(event, 'popup1')">•••</button>
+                            <div class="popup" id="popup1">Develop engaging video lessons to enhance learning experiences.</div>
+                            <div class="task-count">10/10</div>
+                            <div class="progress-container">
+                                <div class="progress-bar" style="width: 100%; background-color: green;"></div>
+                            </div>
+                            <p class="due-date">25 Aug 2024</p>
+                        </div>
+                        <div class="task">
+                            <h4>Field Activities</h4>
+                            <button class="dots-button" onclick="togglePopup(event, 'popup2')">•••</button>
+                            <div class="popup" id="popup2">Conduct field activities to apply theoretical knowledge in real-world scenarios.</div>
+                            <div class="task-count">8/10</div>
+                            <div class="progress-container">
+                                <div class="progress-bar" style="width: 80%; background-color: green;"></div>
+                            </div>
+                            <p class="due-date">28 Aug 2024</p>
+                        </div>
+                        <div class="task">
+                            <h4>Interactive Quiz</h4>
+                            <button class="dots-button" onclick="togglePopup(event, 'popup3')">•••</button>
+                            <div class="popup" id="popup3">Create interactive quizzes to assess student understanding and retention.</div>
+                            <div class="task-count">5/10</div>
+                            <div class="progress-container">
+                                <div class="progress-bar" style="width: 50%; background-color: orange;"></div>
+                            </div>
+                            <p class="due-date">30 Aug 2024</p>
+                        </div>
+                        <div class="task">
+                            <h4>Case Studies</h4>
+                            <button class="dots-button" onclick="togglePopup(event, 'popup4')">•••</button>
+                            <div class="popup" id="popup4">Analyze case studies to develop critical thinking and problem-solving skills.</div>
+                            <div class="task-count">3/10</div>
+                            <div class="progress-container">
+                                <div class="progress-bar" style="width: 30%; background-color: red;"></div>
+                            </div>
+                            <p class="due-date">01 Sep 2024</p>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <h3>In Progress</h3>
+                        <div class="project-count">4 Projects</div>
+
+                        <div class="task">
+                            <h4>Group Discussions</h4>
+                            <button class="dots-button" onclick="togglePopup(event, 'popup5')">•••</button>
+                            <div class="popup" id="popup5">Facilitate group discussions to encourage collaboration and exchange of ideas.</div>
+                            <div class="task-count">6/10</div>
+                            <div class="progress-container">
+                                <div class="progress-bar" style="width: 60%; background-color: orange;"></div>
+                            </div>
+                            <p class="due-date">24 Aug 2024</p>
+                        </div>
+                        <div class="task">
+                            <h4>Simulation Games</h4>
+                            <button class="dots-button" onclick="togglePopup(event, 'popup6')">•••</button>
+                            <div class="popup" id="popup6">Implement simulation games to provide hands-on learning experiences.</div>
+                            <div class="task-count">4/10</div>
+                            <div class="progress-container">
+                                <div class="progress-bar" style="width: 40%; background-color: red;"></div>
+                            </div>
+                            <p class="due-date">30 Aug 2024</p>
+                        </div>
+                        <div class="task">
+                            <h4>Wildlife Tracking</h4>
+                            <button class="dots-button" onclick="togglePopup(event, 'popup7')">•••</button>
+                            <div class="popup" id="popup7">Conduct wildlife tracking activities to study animal behavior in their natural habitat.</div>
+                            <div class="task-count">2/10</div>
+                            <div class="progress-container">
+                                <div class="progress-bar" style="width: 20%; background-color: red;"></div>
+                            </div>
+                            <p class="due-date">05 Sep 2024</p>
+                        </div>
+                        <div class="task">
+                            <h4>Resource Sharing</h4>
+                            <button class="dots-button" onclick="togglePopup(event, 'popup8')">•••</button>
+                            <div class="popup" id="popup8">Share resources among participants to enhance learning outcomes.</div>
+                            <div class="task-count">7/10</div>
+                            <div class="progress-container">
+                                <div class="progress-bar" style="width: 70%; background-color: orange;"></div>
+                            </div>
+                            <p class="due-date">10 Sep 2024</p>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <h3>Completed</h3>
+                        <div class="project-count">3 Projects</div>
+
+                        <div class="task">
+                            <h4>Resource Sharing</h4>
+                            <button class="dots-button" onclick="togglePopup(event, 'popup9')">•••</button>
+                            <div class="popup" id="popup9">Successfully shared resources, resulting in improved collaboration.</div>
+                            <div class="task-count">10/10</div>
+                            <div class="progress-container">
+                                <div class="progress-bar" style="width: 100%; background-color: green;"></div>
+                            </div>
+                            <p class="due-date">01 Aug 2024</p>
+                        </div>
+                        <div class="task">
+                            <h4>Storytelling Sessions</h4>
+                            <button class="dots-button" onclick="togglePopup(event, 'popup10')">•••</button>
+                            <div class="popup" id="popup10">Conducted storytelling sessions to enhance communication skills.</div>
+                            <div class="task-count">10/10</div>
+                            <div class="progress-container">
+                                <div class="progress-bar" style="width: 100%; background-color: green;"></div>
+                            </div>
+                            <p class="due-date">15 Aug 2024</p>
+                        </div>
+                        <div class="task">
+                            <h4>Field Reports</h4>
+                            <button class="dots-button" onclick="togglePopup(event, 'popup11')">•••</button>
+                            <div class="popup" id="popup11">Completed field reports documenting key findings and observations.</div>
+                            <div class="task-count">10/10</div>
+                            <div class="progress-container">
+                                <div class="progress-bar" style="width: 100%; background-color: green;"></div>
+                            </div>
+                            <p class="due-date">20 Aug 2024</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <footer>
+                <div class="footer-container">
+                    <div class="eec-info">
+                        <h4>Nature's Guardians Info</h4>
+                        <ul>
+                            <li><a href="#" id="aboutUsLink">About Us</a></li>
+                        </ul>
+                    </div>
+                    <div class="Quick Links">
+                        <h4>Quick Links:</h4>
+                        <ul>
+                            <li><a href="#" id="termsLink">Terms of Service</a></li>
+                            <li><a href="mailto:nature'sGaurdian2025@gmail.com">Contact Us</a></li>
+                            <li><a href="#" id="privacyLink">Privacy Policy</a></li>
+                        </ul>
+                    </div>
+                    <div class="social">
+                        <h4>Social</h4>
+                        <ul>
+                            <li><a href="https://instagram.com/NATURESGUARDIANSS" target="_blank">@NaturesGuardianss</a></li>
+                            <li>Follow us on Social Media!</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <p>&copy; 2025 Nature's Guardians. All rights reserved.</p>
+                </div>
+            </footer>
+        </section>
+    </div>
+</div>
+
+<!-- The Terms Modal -->
+<div id="termsModal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="closeTerms">&times;</span>
+        <h1>Terms of Service</h1>
+        <h2>1. Introduction</h2>
+        <p>These Terms govern your use of the "Nature's Guardians" platform. By using our services, you agree to comply with these terms.</p>
+        <h2>2. User Responsibilities</h2>
+        <p>Users must be at least 13 years old to use the platform. If you are under 18, you need parental consent.</p>
+        <h2>3. Data Usage</h2>
+        <p>Users can upload images of wildlife for identification. By uploading images, you grant us permission to use this data solely to improve our model.</p>
+        <h2>4. Content Ownership</h2>
+        <p>All content on the platform is the exclusive property of Nature's Guardians.</p>
+        <h2>5. Model Limitations</h2>
+        <p>The model's predictions are not guaranteed to be accurate.</p>
+        <h2>6. Conservation Awareness</h2>
+        <p>The platform may include educational content about each species' conservation status.</p>
+        <h2>7. Modifications to Terms</h2>
+        <p>Nature's Guardians reserves the right to modify these Terms at any time.</p>
+        <h2>8. Limitation of Liability</h2>
+        <p>Nature's Guardians shall not be liable for any damages arising from the use of the platform.</p>
+        <h2>9. Contact Information</h2>
+        <p>For any questions, please contact us at NaturesGuardians1@gmail.com.</p>
+    </div>
+</div>
+
+<!-- The Privacy Policy Modal -->
+<div id="privacyModal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="closePrivacy">&times;</span>
+        <h1>Privacy Policy</h1>
+        <h2>1. Information Collection</h2>
+        <p>We collect personal information when users register and upload images.</p>
+        <h2>2. Data Protection</h2>
+        <p>We implement security measures to protect your personal information.</p>
+        <h2>3. User Rights</h2>
+        <p>Users have the right to access, correct, or delete their personal information.</p>
+        <h2>4. Changes to Privacy Policy</h2>
+        <p>Nature's Guardians reserves the right to modify this Privacy Policy at any time.</p>
+        <h2>5. Third-Party Services</h2>
+        <p>Our platform may contain links to third-party websites.</p>
+        <h2>6. Cookies and Tracking Technologies</h2>
+        <p>We may use cookies to enhance user experience.</p>
+        <h2>7. Contact Information</h2>
+        <p>If you have any questions regarding this Privacy Policy, please contact us.</p>
+    </div>
+</div>
+
+<!-- The About Us Modal -->
+<div id="aboutUsModal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="closeAboutUs">&times;</span>
+    <h1>About Us</h1>
+    <p>Welcome to Nature's Guardians, a dedicated platform aimed at promoting wildlife conservation and raising awareness about endangered species. Our mission is to harness the power of technology to classify and protect our planet's diverse wildlife.</p>
+    
+    <h3>Our Mission</h3>
+    <p>We strive to utilize advanced machine learning techniques to provide accurate identification of endangered species from images. By doing so, we hope to empower individuals and organizations to take action in conservation efforts.</p>
+    
+    <h3>Our Vision</h3>
+    <p>We envision a world where every individual is aware of the importance of biodiversity and actively participates in conservation initiatives. Through education and engagement, we aim to inspire a collective effort to protect our planet's wildlife.</p>
+    
+    <h3>Our Values</h3>
+    <ul>
+        <li><strong>Integrity:</strong> We uphold the highest ethical standards in our work.</li>
+        <li><strong>Innovation:</strong> We embrace new technologies and ideas to enhance our impact.</li>
+        <li><strong>Collaboration:</strong> We believe in partnerships that drive effective conservation solutions.</li>
+        <li><strong>Education:</strong> We are committed to raising awareness about wildlife conservation.</li>
+    </ul>
+    
+    <p>Join us on our journey to protect the planet's wildlife. Together, we can make a difference!</p>
+</div>
+</div>
+
+<script>
+// Modal functionality for Terms
+const termsModal = document.getElementById("termsModal");
+const termsLink = document.getElementById("termsLink");
+const closeTermsBtn = document.getElementById("closeTerms");
+
+termsLink.onclick = function() {
+    termsModal.style.display = "block";
+}
+
+closeTermsBtn.onclick = function() {
+    termsModal.style.display = "none";
+}
+
+window.onclick = function(event) {
+    if (event.target == termsModal) {
+        termsModal.style.display = "none";
+    }
+}
+
+// Modal functionality for Privacy Policy
+const privacyModal = document.getElementById("privacyModal");
+const privacyLink = document.getElementById("privacyLink");
+const closePrivacyBtn = document.getElementById("closePrivacy");
+
+privacyLink.onclick = function() {
+    privacyModal.style.display = "block";
+}
+
+closePrivacyBtn.onclick = function() {
+    privacyModal.style.display = "none";
+}
+
+window.onclick = function(event) {
+    if (event.target == privacyModal) {
+        privacyModal.style.display = "none";
+    }
+}
+
+// Modal functionality for About Us
+const aboutUsModal = document.getElementById("aboutUsModal");
+const aboutUsLink = document.getElementById("aboutUsLink");
+const closeAboutUsBtn = document.getElementById("closeAboutUs");
+
+aboutUsLink.onclick = function() {
+    aboutUsModal.style.display = "block";
+}
+
+closeAboutUsBtn.onclick = function() {
+    aboutUsModal.style.display = "none";
+}
+
+window.onclick = function(event) {
+    if (event.target == aboutUsModal) {
+        aboutUsModal.style.display = "none";
+    }
+}
+
+    function togglePopup(event, popupId) {
+        const popup = document.getElementById(popupId);
+        popup.classList.toggle('active');
+    }
+
+    // Close popup if clicking outside
+    window.onclick = function(event) {
+        if (!event.target.matches('.dots-button')) {
+            const popups = document.querySelectorAll('.popup');
+            popups.forEach(popup => {
+                popup.classList.remove('active');
+            });
+        }
+    };
+</script>
+
+</body>
+</html>

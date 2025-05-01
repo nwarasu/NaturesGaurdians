@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Wildlife Explorer</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+    body {
+      background: #f4f4f4;
+    }
+    .top-section {
+      display: flex;
+      width: 100%;
+      padding: 90px;
+      gap: 20px;
+      align-items: stretch;
+    }
+    .left-panel, .right-panel {
+      width: 50%;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .right-panel .video-container {
+      margin-top: 43px; 
+    }
+    #map {
+      width: 100%;
+      height: 150px; 
+      border-radius: 10px;
+    }
+    .info {
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .info h2 {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+    .info p {
+      font-size: 14px;
+      color: #555;
+    }
+    .video-container {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .video-container video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .overlay {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      background: rgba(0, 0, 0, 0.5);
+      color: white;
+      padding: 10px 15px;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+    .spot-nearby {
+      margin: 20px;
+    }
+    .spot-nearby h2 {
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+    .spot-images {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .spot-images img {
+      width: calc(33.333% - 10px);
+      height: 250px;
+      object-fit: cover;
+      border-radius: 10px;
+      border: 2px solid #ddd;
+    }
+    /* Footer Styles */
+    footer { background-color: #d2b48c;color: black; padding: 20px 0;font-family: Arial, sans-serif;position: relative; clear: both;}
+        .footer-container {display: flex;justify-content: space-around;flex-wrap: wrap;max-width: 1200px; margin: auto;}
+        .footer-container div {flex: 1 1 200px; /* Allow flexibility for small screens */margin: 10px;}
+        .footer-container h4 {margin-bottom: 10px;}
+        .footer-container ul {list-style-type: none; padding: 0;}
+        .footer-container li {margin: 5px 0;}
+        .footer-container a {color: black;text-decoration: none;}
+        .footer-container a:hover {text-decoration: underline;}
+        .footer-bottom {text-align: center;margin-top: 20px;font-size: 0.8em;}
+
+    /* Modal Styling */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+    .modal-content {
+      background-color: white;
+      margin: 10% auto;
+      padding: 20px;
+      width: 80%;
+      max-width: 600px;
+      border-radius: 10px;
+    }
+    .close {
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .close:hover {
+      color: red;
+    }
+
+
+
+    /* Basic Reset */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Top Navigation Bar */
+.sidebar {
+  width: 100%;
+  background: #d2b48c;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+}
+
+/* Left and Right Sections */
+.left-section, .right-section {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+/* Center Section */
+.center-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 35px;
+  flex: 1;
+  transform: translateX(-15px);
+}
+
+/* Navigation Item */
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 10px;
+  color: #333;
+  text-align: center;
+  position: relative;
+}
+
+.nav-item button {
+  width: 45px;
+  height: 45px;
+  background-size: cover;
+  background-position: center;
+  border: none;
+  cursor: pointer;
+  background-color: transparent;
+  margin-bottom: 5px;
+}
+
+/* Button Images */
+.btn1 {
+  background-image: url('images/button1.png');
+  width: 120px;
+  height: 120px;
+}
+
+.btn2 { background-image: url('images/projectsbutton.png'); }
+.btn3 { background-image: url('images/researchbutton.png'); }
+.btn4 { background-image: url('images/commentbutton.png'); }
+.btn5 { background-image: url('images/interactbutton.png'); }
+.btn6 { background-image: url('images/camerabutton.png'); }
+
+/* Account Icon */
+.account-icon {
+  background-image: url('images/accountbutton.png');
+  width: 45px;
+  height: 45px;
+  background-size: cover;
+  background-position: center;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  margin-bottom: 5px;
+}
+
+/* Tooltip */
+.tooltip {
+  visibility: hidden;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  border-radius: 5px;
+  padding: 5px 8px;
+  position: absolute;
+  bottom: 110%;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  white-space: nowrap;
+  font-size: 12px;
+  z-index: 999;
+}
+
+.nav-item:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Account Dropdown */
+.account-item {
+  position: relative;
+}
+
+.account-dropdown {
+  display: none;
+  position: absolute;
+  left: 0;
+  top: 60px;
+  background-color: white;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+  z-index: 1;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.account-dropdown a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  font-size: 14px;
+}
+
+.account-dropdown a:hover {
+  background-color: #ddd;
+}
+
+.account-item:hover .account-dropdown {
+  display: block;
+}
+
+
+
+.quiz-section {
+    background: #d2b48c98;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px;
+}
+
+#options {
+    margin-top: 15px;
+}
+
+.option {
+    background: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    cursor: pointer;
+    margin: 5px 0;
+}
+
+.option:hover {
+    background: #e0e0e0;
+}
+
+#next-button {
+    background-color: white; 
+    color: black; 
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    padding: 10px 15px; /* Padding for spacing */
+    cursor: pointer; /* Pointer cursor on hover */
+    font-size: 16px; /* Font size */
+}
+
+#next-button:hover {
+    background-color: rgb(145, 145, 145); /* Darker green on hover */
+}
+
+  </style>
+</head>
+
+<body>
+
+<!-- Top Navigation Bar -->
+<div class="sidebar">
+  <div class="left-section">
+    <div class="nav-item">
+      <a href="home.html">
+        <button class="btn1" title="HOME"></button>
+      </a>
+      <div class="tooltip">HOME</div>
+      HOME
+    </div>
+    <div class="nav-item account-item">
+      <button class="account-icon" title="ACCOUNT"></button>
+      <div class="tooltip">ACCOUNT</div>
+      ACCOUNT
+      <div class="account-dropdown">
+        <a href="EDITPROFILE.html">Edit Account</a>
+        <a href="Signin-upWithoutGA.html">Sign In</a>
+        <a href="signup.html">Sign Up</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="center-section nav-icons">
+    <div class="nav-item">
+      <a href="learn.html">
+        <button class="btn2" title="PROJECTS"></button>
+      </a>
+      <div class="tooltip">PROJECTS</div>
+      PROJECTS
+    </div>
+    <div class="nav-item">
+      <a href="paricipation2.html">
+        <button class="btn3" title="RESEARCH"></button>
+      </a>
+      <div class="tooltip">RESEARCH</div>
+      RESEARCH
+    </div>
+    <div class="nav-item">
+      <a href="ward.html">
+        <button class="btn4" title="FEEDBACK"></button>
+      </a>
+      <div class="tooltip">FEEDBACK</div>
+      FEEDBACK
+    </div>
+    <div class="nav-item">
+      <a href="index.html">
+        <button class="btn5" title="INTERACT"></button>
+      </a>
+      <div class="tooltip">INTERACT</div>
+      INTERACT
+    </div>
+    <div class="nav-item">
+      <a href="speciesID.html">
+        <button class="btn6" title="UPLOAD"></button>
+      </a>
+      <div class="tooltip">UPLOAD</div>
+      UPLOAD
+    </div>
+  </div>
+
+  <div class="right-section">
+    <!-- Empty - you can add more buttons if needed -->
+  </div>
+</div>
+
+
+
+  <div class="top-section">
+    <div class="left-panel">
+      <h2 id="location-name">Loading location...</h2>
+      <div id="map"></div>
+      <div class="info">
+        <h2>You are here</h2>
+        <p>Nature’s Guardians – Species Identification 🌿🦌<br><br>
+            Nature’s Guardians is a conservation-focused platform that helps users identify endangered species through AI-powered image 
+            recognition. Simply upload a picture of an animal, and the system will analyze and provide its species name, habitat, and 
+            conservation status.
+            The platform also features real-time wildlife spotting, educational resources, and a collaborative space for researchers and 
+            nature enthusiasts. By combining technology with conservation efforts, Nature’s Guardians aims to raise awareness and protect biodiversity. 🌍🐾
+        </p>
+      </div>
+    </div>
+
+    <div class="right-panel">
+      <div class="video-container">
+        <video autoplay loop muted>
+          <source src="videos/arabian gazala.mov" type="video/mp4">
+        </video>
+        <div class="overlay">
+          The Arabian gazelle thrives in arid landscapes and rocky terrains.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="quiz-section" class="quiz-section">
+    <h2>Wildlife Quiz</h2>
+    <div id="quiz-container">
+        <div id="question"></div>
+        <div id="options"></div>
+        <br>
+        <button id="next-button" style="display: none;"> Next </button>
+    </div>
+    <div id="result" style="display: none;"></div>
+</div>
+
+  <div class="spot-nearby">
+    <h2>Spot Nearby</h2>
+    <div class="spot-images">
+      <img src="images/photo1.jpg" alt="Nearby Animal 1" />
+      <img src="images/photo2.png" alt="Nearby Animal 2" />
+      <img src="images/photo3.jpg" alt="Nearby Animal 3" />
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-container">
+      <div>
+        <h4>Nature's Guardians Info</h4>
+        <ul>
+          <li><a id="aboutUsLink">About Us</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a id="termsLink">Terms of Service</a></li>
+          <li><a href="mailto:naturesguardian2025@gmail.com">Contact Us</a></li>
+          <li><a id="privacyLink">Privacy Policy</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Social</h4>
+        <ul>
+          <li><a href="https://instagram.com/NATURESGUARDIANSS" target="_blank">@NaturesGuardianss</a></li>
+          <li>Follow us on social media!</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 Nature's Guardians. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- The Terms Modal -->
+  <div id="termsModal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="closeTerms">&times;</span>
+        <h1>Terms of Service</h1>
+        <h2>1. Introduction</h2>
+        <p>These Terms govern your use of the "Nature's Guardians" platform. By using our services, you agree to comply with these terms. Our mission is to develop a deep learning model that classifies endangered species from images, thereby supporting wildlife conservation and raising awareness about endangered species.</p>
+        
+        <h2>2. User Responsibilities</h2>
+        <p>Users must be at least 13 years old to use the platform. If you are under 18, you need parental consent. You are responsible for keeping your account information confidential and for all activities that occur under your account. You agree to use the platform only for lawful purposes and in a manner that does not infringe the rights of others.</p>
+        
+        <h2>3. Data Usage</h2>
+        <p>Users can upload images of wildlife for identification. By uploading images, you grant us permission to use this data solely to improve our model and its functionalities. We are committed to protecting your privacy; personal information collected during registration or image uploads will not be shared with third parties without your consent, except as required by law.</p>
+        
+        <h2>4. Content Ownership</h2>
+        <p>All content, features, and functionalities on the Nature's Guardians platform, including text, graphics, and software, are the exclusive property of Nature's Guardians or its licensors. Users retain ownership of any images they upload but grant us a non-exclusive, royalty-free license to use, reproduce, modify, and publish this content for project purposes. You agree not to use any content from the platform without our express written permission.</p>
+        
+        <h2>5. Model Limitations</h2>
+        <p>While we strive for high accuracy, the model's predictions are not guaranteed. We encourage users to report any misclassifications or errors to help improve the model's performance. We do not accept responsibility for any decisions made based on the model's outputs.</p>
+
+        <h2>6. Conservation Awareness</h2>
+        <p>The platform may include educational content about each species’ conservation status, habitat, and threats. Users are encouraged to engage with this information and actively support conservation efforts. We may also share updates and news related to wildlife conservation through our platform.</p>
+        
+        <h2>7. Modifications to Terms</h2>
+        <p>Nature's Guardians reserves the right to modify these Terms & Policies at any time. Users will be notified of significant changes through the platform. Continued use of the service after modifications constitutes acceptance of the revised terms.</p>
+        
+        <h2>8. Limitation of Liability</h2>
+        <p>Nature's Guardians shall not be liable for any direct, indirect, incidental, or consequential damages arising from the use or inability to use the platform or for any errors in the content provided. This includes but is not limited to loss of data or profits arising from the use of our services.</p>
+        
+        <h2>9. Contact Information</h2>
+        <p>For any questions or concerns regarding these Terms & Policies, please contact us at NaturesGuardians1@gmail.com.</p>
+    </div>
+</div>
+
+<!-- The Privacy Policy Modal -->
+<div id="privacyModal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="closePrivacy">&times;</span>
+        <h1>Privacy Policy</h1>
+        <h2>1. Information Collection</h2>
+        <p>We collect personal information when users register and upload images. This information may include your name, email address, and any uploaded images. This information is used to enhance user experience and improve our services.</p>
+
+        <h2>2. Data Protection</h2>
+        <p>We implement security measures to protect your personal information, including encryption and secure servers. However, no method of transmission over the Internet is 100% secure, and we cannot guarantee its absolute security.</p>
+
+        <h2>3. User Rights</h2>
+        <p>Users have the right to access, correct, or delete their personal information at any time. You can request to review or change your information by contacting us directly. We will respond to your request within a reasonable timeframe.</p>
+
+        <h2>4. Changes to Privacy Policy</h2>
+        <p>Nature's Guardians reserves the right to modify this Privacy Policy at any time. Users will be notified of significant changes through the platform. Continued use of the service after modifications constitutes acceptance of the revised policy.</p>
+
+        <h2>5. Third-Party Services</h2>
+        <p>Our platform may contain links to third-party websites. We do not control these sites and are not responsible for their content or privacy practices. We encourage you to review their privacy policies before providing any personal information.</p>
+
+        <h2>6. Cookies and Tracking Technologies</h2>
+        <p>We may use cookies and tracking technologies to enhance user experience and analyze website traffic. Users can choose to accept or decline cookies through their browser settings. However, declining cookies may prevent you from taking full advantage of the platform.</p>
+
+        <h2>7. Contact Information</h2>
+        <p>If you have any questions regarding this Privacy Policy or our data practices, please contact us at NaturesGuardians1@gmail.com.</p>
+    </div>
+</div>
+
+<!-- The About Us Modal -->
+<div id="aboutUsModal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="closeAboutUs">&times;</span>
+        <h1>About Us</h1>
+        <p>Welcome to Nature's Guardians, a dedicated platform aimed at promoting wildlife conservation and raising awareness about endangered species. Our mission is to harness the power of technology to classify and protect our planet's diverse wildlife.</p>
+        
+        <h3>Our Mission</h3>
+        <p>We strive to utilize advanced machine learning techniques to provide accurate identification of endangered species from images. By doing so, we hope to empower individuals and organizations to take action in conservation efforts.</p>
+        
+        <h3>Our Vision</h3>
+        <p>We envision a world where every individual is aware of the importance of biodiversity and actively participates in conservation initiatives. Through education and engagement, we aim to inspire a collective effort to protect our planet's wildlife.</p>
+        
+        <h3>Our Values</h3>
+        <ul>
+            <li><strong>Integrity:</strong> We uphold the highest ethical standards in our work.</li>
+            <li><strong>Innovation:</strong> We embrace new technologies and ideas to enhance our impact.</li>
+            <li><strong>Collaboration:</strong> We believe in partnerships that drive effective conservation solutions.</li>
+            <li><strong>Education:</strong> We are committed to raising awareness about wildlife conservation.</li>
+        </ul>
+        
+        <p>Join us on our journey to protect the planet's wildlife. Together, we can make a difference!</p>
+    </div>
+</div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const defaultLocation = [21.2515049, 48.5299560];
+      const locationHeading = document.getElementById("location-name");
+      const map = L.map("map").setView(defaultLocation, 10);
+
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "&copy; OpenStreetMap contributors"
+      }).addTo(map);
+
+      const marker = L.marker(defaultLocation).addTo(map)
+        .bindPopup("Rub' al Khali, Saudi Arabia")
+        .openPopup();
+
+      function getLocationName(lat, lon) {
+        fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`)
+          .then(response => response.json())
+          .then(data => {
+            const city = data.address.city || data.address.town || data.address.village || "Unknown City";
+            const country = data.address.country || "Unknown Country";
+            locationHeading.textContent = `${city}, ${country}`;
+          })
+          .catch(error => {
+            console.error("Error fetching location name:", error);
+          });
+      }
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const userLocation = [
+              position.coords.latitude,
+              position.coords.longitude,
+            ];
+            map.setView(userLocation, 12);
+            marker.setLatLng(userLocation)
+              .bindPopup("You are here")
+              .openPopup();
+            getLocationName(userLocation[0], userLocation[1]);
+          },
+          () => {
+            getLocationName(defaultLocation[0], defaultLocation[1]);
+          }
+        );
+      } else {
+        getLocationName(defaultLocation[0], defaultLocation[1]);
+      }
+
+      // Modal logic
+      function openModal(id) {
+        document.getElementById(id).style.display = "block";
+      }
+      function closeModal(id) {
+        document.getElementById(id).style.display = "none";
+      }
+
+      document.getElementById("aboutUsLink").onclick = () => openModal("aboutUsModal");
+      document.getElementById("termsLink").onclick = () => openModal("termsModal");
+      document.getElementById("privacyLink").onclick = () => openModal("privacyModal");
+
+      document.getElementById("closeTerms").onclick = () => closeModal("termsModal");
+      document.getElementById("closePrivacy").onclick = () => closeModal("privacyModal");
+      document.getElementById("closeAboutUs").onclick = () => closeModal("aboutUsModal");
+
+      window.onclick = function(event) {
+        if (event.target.classList.contains('modal')) {
+          event.target.style.display = "none";
+        }
+      }
+    });
+
+    const quizData = [
+    {
+        question: "What is the largest land animal?",
+        options: [ "  Giraffe", "  Elephant", "  Rhino", "  Hippo"],
+        answer: "  Elephant"
+    },
+    {
+        question: "Which animal is known as the King of the Jungle?",
+        options: ["  Tiger", "  Bear", "  Lion", "  Eagle"],
+        answer: "  Lion"
+    },
+    {
+        question: "What is the fastest land animal?",
+        options: ["  Cheetah", "  Leopard", "  Gazelle", "  Horse"],
+        answer: "  Cheetah"
+    }
+];
+
+let currentQuestionIndex = 0;
+let score = 0;
+
+function loadQuestion() {
+    const currentQuestion = quizData[currentQuestionIndex];
+    document.getElementById("question").innerText = currentQuestion.question;
+    const optionsContainer = document.getElementById("options");
+    optionsContainer.innerHTML = "";
+
+    currentQuestion.options.forEach(option => {
+        const label = document.createElement("label");
+        const radio = document.createElement("input");
+        radio.type = "radio";
+        radio.name = "option";
+        radio.value = option;
+        label.appendChild(radio);
+        label.appendChild(document.createTextNode(option));
+        optionsContainer.appendChild(label);
+        optionsContainer.appendChild(document.createElement("br")); // Line break for spacing
+    });
+
+    // Add event listeners for the radio buttons
+    document.querySelectorAll('input[name="option"]').forEach(option => {
+        option.onclick = selectOption;
+    });
+
+    document.getElementById("next-button").style.display = "none";
+}
+
+function selectOption() {
+    const selectedOption = document.querySelector('input[name="option"]:checked');
+    if (selectedOption) {
+        const currentQuestion = quizData[currentQuestionIndex];
+        if (selectedOption.value === currentQuestion.answer) {
+            score++;
+        }
+        document.getElementById("next-button").style.display = "block";
+    } else {
+        alert("Please select an option.");
+    }
+}
+
+function nextQuestion() {
+    currentQuestionIndex++;
+    if (currentQuestionIndex < quizData.length) {
+        loadQuestion();
+    } else {
+        showResult();
+    }
+}
+
+function showResult() {
+    document.getElementById("quiz-container").style.display = "none";
+    const resultContainer = document.getElementById("result");
+    resultContainer.innerHTML = `<h2>Your Score: ${score} / ${quizData.length}</h2>`;
+    resultContainer.style.display = "block";
+
+    // Show confetti if score is perfect
+    if (score === quizData.length) {
+        startConfetti();
+    }
+}
+
+function startConfetti() {
+    confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+    });
+}
+
+document.getElementById("next-button").onclick = nextQuestion;
+
+// Load the first question on page load
+loadQuestion();
+
+
+
+  </script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+
+</body>
+</html>

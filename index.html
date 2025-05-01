@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comment Section</title>
+    <link rel="stylesheet" href="styles.css">
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            display: flex;
+        }
+        
+        .container {
+            flex-grow: 1;
+            max-width: 1200px;
+            margin: auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-left: 100px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0, 0, 0, 0.5); /* Black w/ opacity */
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 10% auto; /* Center modal */
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            width: 80%; /* Responsive width */
+            max-width: 600px; /* Max width for large screens */
+            position: relative;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+        }
+
+        .comment-section input,
+        .comment-section textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        .comment-section button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .comment-section button:hover {
+            background-color: #0056b3;
+        }
+
+        .existing-comments {
+            display: flex;
+            flex-wrap: nowrap; /* Prevent wrapping */
+            gap: 10px; /* Space between comments */
+            margin-top: 10px;
+        }
+
+        .existing-comment, .latest-comment {
+            background: #f9f9f9;
+            padding: 10px;
+            border-radius: 4px;
+            width: 200px; /* Fixed width for existing comments */
+            box-sizing: border-box; /* Include padding in width */
+        }
+
+        /* Footer Styles */
+        footer {
+            background-color: #d2b48c; /* Dark brown background */
+            color: white;
+            padding: 20px 0;
+            font-family: Arial, sans-serif;
+            position: relative; /* Ensure it stays in document flow */
+            clear: both; /* Clear floats if used */
+        }
+
+        .footer-container {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        .footer-container div {
+            flex: 1 1 200px; /* Allow flexibility for small screens */
+            margin: 10px;
+        }
+
+        .footer-container h4 {
+            margin-bottom: 10px;
+        }
+
+        .footer-container ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .footer-container li {
+            margin: 5px 0;
+        }
+
+        .footer-container a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .footer-container a:hover {
+            text-decoration: underline;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.8em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <section class="main-section">
+            <div class="comment-section">
+                <h2>Write a Comment</h2>
+                <form id="commentForm">
+                    <p>Your Name</p>
+                    <input type="text" id="userName" placeholder="Enter your name" required>
+                    <p>Comment</p>
+                    <textarea id="userComment" placeholder="Write your comment here" required></textarea>
+                    <p>
+                    <button type="submit">Submit</button></p>
+                </form>
+            </div>
+            <div class="image-container">
+                <img src="file:///C:/Users/toto2/OneDrive/Desktop/rac.jpeg" alt="Raccoon" class="raccoon-image" style="width: 100%; max-width: 400px; margin-top: 20px;">
+            </div>
+        </section>  
+
+        <section class="existing-comments">
+            <h2>Existing Comments</h2>
+            <div id="existingComments" class="existing-comments">
+                <div class="existing-comment">
+                    <p><strong>User123:</strong> Great info about the raccoon!</p>
+                    <span>10-08-2024</span>
+                </div>
+                <div class="existing-comment">
+                    <p><strong>User456:</strong> Interesting fact, thanks!</p>
+                    <span>1-08-2024</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="latest-comments" id="latestComments">
+            <h2>Latest Comments</h2>
+            <div id="latestCommentsList" class="latest-comments">
+                <div class="latest-comment">
+                    <p><strong>User789:</strong> What amazing information to know!</p>
+                    <span>10-08-2024</span>
+                </div>
+                <div class="latest-comment">
+                    <p><strong>User101:</strong> Wow, that is really fantastic</p>
+                    <span>1-08-2024</span>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <footer>
+                <div class="footer-container">
+                    <div class="eec-info">
+                        <h4>Nature's Guardians Info</h4>
+                        <ul>
+                            <li><a href="#" id="aboutUsLink">About Us</a></li>
+                        </ul>
+                    </div>
+                    <div class="Quick Links">
+                        <h4>Quick Links:</h4>
+                        <ul>
+                            <li><a href="#" id="termsLink">Terms of Service</a></li>
+                            <li><a href="mailto:nature'sGaurdian2025@gmail.com">Contact Us</a></li>
+                            <li><a href="#" id="privacyLink">Privacy Policy</a></li>
+                        </ul>
+                    </div>
+                    <div class="social">
+                        <h4>Social</h4>
+                        <ul>
+                            <li><a href="https://instagram.com/NATURESGUARDIANSS" target="_blank">@NaturesGuardianss</a></li>
+                            <li>Follow us on Social Media!</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <p>&copy; 2025 Nature's Guardians. All rights reserved.</p>
+                </div>
+            </footer>
+        </section>
+    </div>
+
+    <!-- The Terms Modal -->
+    <div id="termsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeTerms">&times;</span>
+            <h1>Terms of Service</h1>
+            <h2>1. Introduction</h2>
+            <p>These Terms govern your use of the "Nature's Guardians" platform. By using our services, you agree to comply with these terms. Our mission is to develop a deep learning model that classifies endangered species from images, thereby supporting wildlife conservation and raising awareness about endangered species.</p>
+            
+            <h2>2. User Responsibilities</h2>
+            <p>Users must be at least 13 years old to use the platform. If you are under 18, you need parental consent. You are responsible for keeping your account information confidential and for all activities that occur under your account. You agree to use the platform only for lawful purposes and in a manner that does not infringe the rights of others.</p>
+            
+            <h2>3. Data Usage</h2>
+            <p>Users can upload images of wildlife for identification. By uploading images, you grant us permission to use this data solely to improve our model and its functionalities. We are committed to protecting your privacy; personal information collected during registration or image uploads will not be shared with third parties without your consent, except as required by law.</p>
+            
+            <h2>4. Content Ownership</h2>
+            <p>All content, features, and functionalities on the Nature's Guardians platform, including text, graphics, and software, are the exclusive property of Nature's Guardians or its licensors. Users retain ownership of any images they upload but grant us a non-exclusive, royalty-free license to use, reproduce, modify, and publish this content for project purposes. You agree not to use any content from the platform without our express written permission.</p>
+            
+            <h2>5. Model Limitations</h2>
+            <p>While we strive for high accuracy, the model's predictions are not guaranteed. We encourage users to report any misclassifications or errors to help improve the model's performance. We do not accept responsibility for any decisions made based on the model's outputs.</p>
+
+            <h2>6. Conservation Awareness</h2>
+            <p>The platform may include educational content about each species’ conservation status, habitat, and threats. Users are encouraged to engage with this information and actively support conservation efforts. We may also share updates and news related to wildlife conservation through our platform.</p>
+            
+            <h2>7. Modifications to Terms</h2>
+            <p>Nature's Guardians reserves the right to modify these Terms & Policies at any time. Users will be notified of significant changes through the platform. Continued use of the service after modifications constitutes acceptance of the revised terms.</p>
+            
+            <h2>8. Limitation of Liability</h2>
+            <p>Nature's Guardians shall not be liable for any direct, indirect, incidental, or consequential damages arising from the use or inability to use the platform or for any errors in the content provided. This includes but is not limited to loss of data or profits arising from the use of our services.</p>
+            
+            <h2>9. Contact Information</h2>
+            <p>For any questions or concerns regarding these Terms & Policies, please contact us at NaturesGuardians1@gmail.com.</p>
+        </div>
+    </div>
+
+    <!-- The Privacy Policy Modal -->
+    <div id="privacyModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closePrivacy">&times;</span>
+            <h1>Privacy Policy</h1>
+            <h2>1. Information Collection</h2>
+            <p>We collect personal information when users register and upload images. This information may include your name, email address, and any uploaded images. This information is used to enhance user experience and improve our services.</p>
+
+            <h2>2. Data Protection</h2>
+            <p>We implement security measures to protect your personal information, including encryption and secure servers. However, no method of transmission over the Internet is 100% secure, and we cannot guarantee its absolute security.</p>
+
+            <h2>3. User Rights</h2>
+            <p>Users have the right to access, correct, or delete their personal information at any time. You can request to review or change your information by contacting us directly. We will respond to your request within a reasonable timeframe.</p>
+
+            <h2>4. Changes to Privacy Policy</h2>
+            <p>Nature's Guardians reserves the right to modify this Privacy Policy at any time. Users will be notified of significant changes through the platform. Continued use of the service after modifications constitutes acceptance of the revised policy.</p>
+
+            <h2>5. Third-Party Services</h2>
+            <p>Our platform may contain links to third-party websites. We do not control these sites and are not responsible for their content or privacy practices. We encourage you to review their privacy policies before providing any personal information.</p>
+
+            <h2>6. Cookies and Tracking Technologies</h2>
+            <p>We may use cookies and tracking technologies to enhance user experience and analyze website traffic. Users can choose to accept or decline cookies through their browser settings. However, declining cookies may prevent you from taking full advantage of the platform.</p>
+
+            <h2>7. Contact Information</h2>
+            <p>If you have any questions regarding this Privacy Policy or our data practices, please contact us at NaturesGuardians1@gmail.com.</p>
+        </div>
+    </div>
+
+    <!-- The About Us Modal -->
+    <div id="aboutUsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeAboutUs">&times;</span>
+            <h1>About Us</h1>
+            <p>Welcome to Nature's Guardians, a dedicated platform aimed at promoting wildlife conservation and raising awareness about endangered species. Our mission is to harness the power of technology to classify and protect our planet's diverse wildlife.</p>
+            
+            <h3>Our Mission</h3>
+            <p>We strive to utilize advanced machine learning techniques to provide accurate identification of endangered species from images. By doing so, we hope to empower individuals and organizations to take action in conservation efforts.</p>
+            
+            <h3>Our Vision</h3>
+            <p>We envision a world where every individual is aware of the importance of biodiversity and actively participates in conservation initiatives. Through education and engagement, we aim to inspire a collective effort to protect our planet's wildlife.</p>
+            
+            <h3>Our Values</h3>
+            <ul>
+                <li><strong>Integrity:</strong> We uphold the highest ethical standards in our work.</li>
+                <li><strong>Innovation:</strong> We embrace new technologies and ideas to enhance our impact.</li>
+                <li><strong>Collaboration:</strong> We believe in partnerships that drive effective conservation solutions.</li>
+                <li><strong>Education:</strong> We are committed to raising awareness about wildlife conservation.</li>
+            </ul>
+            
+            <p>Join us on our journey to protect the planet's wildlife. Together, we can make a difference!</p>
+        </div>
+    </div>
+
+    <script>
+        // Modal functionality for Terms
+        const termsModal = document.getElementById("termsModal");
+        const termsLink = document.getElementById("termsLink");
+        const closeTermsBtn = document.getElementById("closeTerms");
+
+        termsLink.onclick = function() {
+            termsModal.style.display = "block";
+        }
+
+        closeTermsBtn.onclick = function() {
+            termsModal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == termsModal) {
+                termsModal.style.display = "none";
+            }
+        }
+
+        // Modal functionality for Privacy Policy
+        const privacyModal = document.getElementById("privacyModal");
+        const privacyLink = document.getElementById("privacyLink");
+        const closePrivacyBtn = document.getElementById("closePrivacy");
+
+        privacyLink.onclick = function() {
+            privacyModal.style.display = "block";
+        }
+
+        closePrivacyBtn.onclick = function() {
+            privacyModal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == privacyModal) {
+                privacyModal.style.display = "none";
+            }
+        }
+
+        // Modal functionality for About Us
+        const aboutUsModal = document.getElementById("aboutUsModal");
+        const aboutUsLink = document.getElementById("aboutUsLink");
+        const closeAboutUsBtn = document.getElementById("closeAboutUs");
+
+        aboutUsLink.onclick = function() {
+            aboutUsModal.style.display = "block";
+        }
+
+        closeAboutUsBtn.onclick = function() {
+            aboutUsModal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == aboutUsModal) {
+                aboutUsModal.style.display = "none";
+            }
+        }
+
+        // Comment submission
+        document.getElementById('commentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('userName').value;
+            const comment = document.getElementById('userComment').value;
+
+            const currentDate = new Date().toLocaleDateString('en-GB'); // DD-MM-YYYY
+
+            const latestCommentDiv = document.createElement('div');
+            latestCommentDiv.classList.add('latest-comment');
+            latestCommentDiv.innerHTML = `
+                <p><strong>${name}:</strong> ${comment}</p>
+                <span>${currentDate}</span>
+            `;
+
+            document.getElementById('latestCommentsList').appendChild(latestCommentDiv);
+            document.getElementById('commentForm').reset();
+        });
+    </script>
+
+</body>
+</html>

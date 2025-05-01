@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Account Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Top Navigation Bar Styles */
+        .top-navbar {
+            width: 100%;
+            background: #d2b48c;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            height: 80px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .left-section, .right-section {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .center-section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 35px;
+            flex: 1;
+            transform: translateX(-15px);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 10px;
+            color: #333;
+            text-align: center;
+            position: relative;
+        }
+
+        .nav-item button {
+            width: 45px;
+            height: 45px;
+            background-size: cover;
+            background-position: center;
+            border: none;
+            cursor: pointer;
+            background-color: transparent;
+            margin-bottom: 5px;
+        }
+
+        .btn1 {
+            background-image: url('images/button1.png');
+            width: 120px;
+            height: 120px;
+        }
+
+        .btn2 { background-image: url('images/projectsbutton.png'); }
+        .btn3 { background-image: url('images/researchbutton.png'); }
+        .btn4 { background-image: url('images/commentbutton.png'); }
+        .btn5 { background-image: url('images/interactbutton.png'); }
+        .btn6 { background-image: url('images/camerabutton.png'); }
+
+        .account-icon {
+            background-image: url('images/accountbutton.png');
+            width: 45px;
+            height: 45px;
+            background-size: cover;
+            background-position: center;
+            border: none;
+            background-color: transparent;
+            cursor: pointer;
+            margin-bottom: 5px;
+        }
+
+        .tooltip {
+            visibility: hidden;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 5px;
+            padding: 5px 8px;
+            position: absolute;
+            bottom: 110%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            white-space: nowrap;
+            font-size: 12px;
+            z-index: 999;
+        }
+
+        .nav-item:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .account-item {
+            position: relative;
+        }
+
+        .account-dropdown {
+            display: none;
+            position: absolute;
+            left: 0;
+            top: 60px;
+            background-color: white;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+            z-index: 1;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .account-dropdown a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            font-size: 14px;
+        }
+
+        .account-dropdown a:hover {
+            background-color: #ddd;
+        }
+
+        .account-item:hover .account-dropdown {
+            display: block;
+        }
+
+        /* Main Content Styles */
+        body, html {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            padding-top: 30px; /* Space for fixed navbar */
+        }
+
+        .main {
+            flex: 1;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #f8f9fa;
+            padding: 20px;
+            position: fixed;
+            top: 80px; /* Below the top navbar */
+            bottom: 0;
+            left: 0;
+            overflow-y: auto;
+        }
+
+        .sidebar h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            margin-bottom: 10px;
+        }
+
+        .sidebar ul li a {
+            text-decoration: none;
+            color: #212529;
+            padding: 8px 12px;
+            display: block;
+            border-radius: 4px;
+        }
+
+        .sidebar ul li a:hover,
+        .sidebar ul li a.active {
+            background-color: #e2e6ea;
+        }
+
+        .content {
+            flex-grow: 1;
+            padding: 30px;
+            margin-left: 250px; /* Offset for sidebar */
+        }
+
+        footer { 
+    background-color: #d2b48c; 
+    color: black; 
+    padding: 10px 0; /* Reduced padding */
+    font-family: Arial, sans-serif; 
+    position: relative; 
+    clear: both; 
+    width: 100%;
+}
+
+.footer-container { 
+    display: flex; 
+    justify-content: space-around; 
+    flex-wrap: wrap; 
+    max-width: 1200px; 
+    margin: auto; 
+}
+
+.footer-container div { 
+    flex: 1 1 200px; 
+    margin: 10px; /* Reduced margin */
+}
+
+.footer-container h4 { 
+    font-size: 1em; 
+    font-weight: bold; /* Make titles bold */
+}
+
+.footer-container ul { 
+    list-style-type: none; 
+    padding: 0; 
+}
+
+.footer-container li { 
+    margin: 5px 0; /* Reduced margin */
+}
+
+.footer-container a { 
+    color: black; 
+    text-decoration: none; 
+}
+
+.footer-container a:hover { 
+    text-decoration: underline; 
+}
+
+.footer-bottom { 
+    text-align: center; 
+    margin-top: 10px; /* Reduced margin */
+    font-size: 0.7em; /* Smaller font size */
+}
+
+        /* Modal styles */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 1000; 
+            left: 0; 
+            top: 0; 
+            width: 100%; 
+            height: 100%; 
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center; 
+            align-items: center;
+            overflow: auto;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 15% auto;
+            padding: 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            width: 80%; 
+            max-width: 600px; 
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .close {
+            cursor: pointer;
+            position: absolute; 
+            right: 15px;
+            top: 15px;
+            font-size: 28px;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 200px;
+            }
+            .content, footer {
+                margin-left: 200px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding-top: 60px;
+            }
+            .top-navbar {
+                height: 60px;
+            }
+            .sidebar {
+                width: 100%;
+                position: static;
+                top: auto;
+                display: none; /* Hidden by default on mobile */
+            }
+            .content, footer {
+                margin-left: 0;
+            }
+            .center-section {
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Top Navigation Bar -->
+<div class="top-navbar">
+  <div class="left-section">
+    <div class="nav-item">
+      <a href="home.html">
+        <button class="btn1" title="HOME"></button>
+      </a>
+      <div class="tooltip">HOME</div>
+      HOME
+    </div>
+    <div class="nav-item account-item">
+      <button class="account-icon" title="ACCOUNT"></button>
+      <div class="tooltip">ACCOUNT</div>
+      ACCOUNT
+      <div class="account-dropdown">
+        <a href="EDITPROFILE.html">Edit Account</a>
+        <a href="Signin-upWithoutGA.html">Sign In</a>
+        <a href="signup.html">Sign Up</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="center-section nav-icons">
+    <div class="nav-item">
+      <a href="learn.html">
+        <button class="btn2" title="PROJECTS"></button>
+      </a>
+      <div class="tooltip">PROJECTS</div>
+      PROJECTS
+    </div>
+    <div class="nav-item">
+      <a href="paricipation2.html">
+        <button class="btn3" title="RESEARCH"></button>
+      </a>
+      <div class="tooltip">RESEARCH</div>
+      RESEARCH
+    </div>
+    <div class="nav-item">
+      <a href="ward.html">
+        <button class="btn4" title="FEEDBACK"></button>
+      </a>
+      <div class="tooltip">FEEDBACK</div>
+      FEEDBACK
+    </div>
+    <div class="nav-item">
+      <a href="index.html">
+        <button class="btn5" title="INTERACT"></button>
+      </a>
+      <div class="tooltip">INTERACT</div>
+      INTERACT
+    </div>
+    <div class="nav-item">
+      <a href="speciesID.html">
+        <button class="btn6" title="UPLOAD"></button>
+      </a>
+      <div class="tooltip">UPLOAD</div>
+      UPLOAD
+    </div>
+  </div>
+
+  <div class="right-section">
+    <!-- Empty - you can add more buttons if needed -->
+  </div>
+</div>
+
+<div class="main">
+    <div class="sidebar">
+        <h2>Dashboard</h2>
+        <ul>
+            <li><a href="home.html">Website</a></li>
+            <li><a href="dashboard.html">Overview</a></li>
+            <li><a href="userAcc.html" class="active">User Accounts</a></li>
+        </ul>
+    </div>
+
+    <div class="content">
+        <h2>User Accounts</h2>
+        <button class="btn btn-success mb-3" onclick="showAddModal()">Add User</button>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Email</th>
+                    <th>Username</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="userTable">
+                <tr>
+                    <td>henry@gmail.com</td>
+                    <td>HenryCavil</td>
+                    <td>Admin</td>
+                    <td>Active</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm" onclick="showUpdateModal()">Update</button>
+                        <button class="btn btn-danger btn-sm" onclick="showDeleteModal()">Delete</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<footer>
+    <div class="footer-container">
+        <div class="eec-info">
+            <h4>Nature's Guardians Info</h4>
+            <ul>
+                <li><a href="#" id="aboutUsLink">About Us</a></li>
+            </ul>
+        </div>
+        <div class="quick-links">
+            <h4>Quick Links:</h4>
+            <ul>
+                <li><a href="#" id="termsLink">Terms of Service</a></li>
+                <li><a href="mailto:nature'sGaurdian2025@gmail.com">Contact Us</a></li>
+                <li><a href="#" id="privacyLink">Privacy Policy</a></li>
+            </ul>
+        </div>
+        <div class="social">
+            <h4>Social</h4>
+            <ul>
+                <li><a href="https://instagram.com/NATURESGUARDIANSS" target="_blank">@NaturesGuardianss</a></li>
+                <li>Follow us on Social Media!</li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; 2025 Nature's Guardians. All rights reserved.</p>
+    </div>
+</footer>
+
+<!-- The Terms Modal -->
+<div id="termsModal" class="modal">
+  <div class="modal-content">
+      <span class="close" id="closeTerms">&times;</span>
+      <h1>Terms of Service</h1>
+      <h2>1. Introduction</h2>
+      <p>These Terms govern your use of the "Nature's Guardians" platform. By using our services, you agree to comply with these terms. Our mission is to develop a deep learning model that classifies endangered species from images, thereby supporting wildlife conservation and raising awareness about endangered species.</p>
+      
+      <h2>2. User Responsibilities</h2>
+      <p>Users must be at least 13 years old to use the platform. If you are under 18, you need parental consent. You are responsible for keeping your account information confidential and for all activities that occur under your account. You agree to use the platform only for lawful purposes and in a manner that does not infringe the rights of others.</p>
+      
+      <h2>3. Data Usage</h2>
+      <p>Users can upload images of wildlife for identification. By uploading images, you grant us permission to use this data solely to improve our model and its functionalities. We are committed to protecting your privacy; personal information collected during registration or image uploads will not be shared with third parties without your consent, except as required by law.</p>
+      
+      <h2>4. Content Ownership</h2>
+      <p>All content, features, and functionalities on the Nature's Guardians platform, including text, graphics, and software, are the exclusive property of Nature's Guardians or its licensors. Users retain ownership of any images they upload but grant us a non-exclusive, royalty-free license to use, reproduce, modify, and publish this content for project purposes. You agree not to use any content from the platform without our express written permission.</p>
+      
+      <h2>5. Model Limitations</h2>
+      <p>While we strive for high accuracy, the model's predictions are not guaranteed. We encourage users to report any misclassifications or errors to help improve the model's performance. We do not accept responsibility for any decisions made based on the model's outputs.</p>
+
+      <h2>6. Conservation Awareness</h2>
+      <p>The platform may include educational content about each species' conservation status, habitat, and threats. Users are encouraged to engage with this information and actively support conservation efforts. We may also share updates and news related to wildlife conservation through our platform.</p>
+      
+      <h2>7. Modifications to Terms</h2>
+      <p>Nature's Guardians reserves the right to modify these Terms & Policies at any time. Users will be notified of significant changes through the platform. Continued use of the service after modifications constitutes acceptance of the revised terms.</p>
+      
+      <h2>8. Limitation of Liability</h2>
+      <p>Nature's Guardians shall not be liable for any direct, indirect, incidental, or consequential damages arising from the use or inability to use the platform or for any errors in the content provided. This includes but is not limited to loss of data or profits arising from the use of our services.</p>
+      
+      <h2>9. Contact Information</h2>
+      <p>For any questions or concerns regarding these Terms & Policies, please contact us at NaturesGuardians1@gmail.com.</p>
+  </div>
+</div>
+
+<!-- The Privacy Policy Modal -->
+<div id="privacyModal" class="modal">
+  <div class="modal-content">
+      <span class="close" id="closePrivacy">&times;</span>
+      <h1>Privacy Policy</h1>
+      <h2>1. Information Collection</h2>
+      <p>We collect personal information when users register and upload images. This information may include your name, email address, and any uploaded images. This information is used to enhance user experience and improve our services.</p>
+
+      <h2>2. Data Protection</h2>
+      <p>We implement security measures to protect your personal information, including encryption and secure servers. However, no method of transmission over the Internet is 100% secure, and we cannot guarantee its absolute security.</p>
+
+      <h2>3. User Rights</h2>
+      <p>Users have the right to access, correct, or delete their personal information at any time. You can request to review or change your information by contacting us directly. We will respond to your request within a reasonable timeframe.</p>
+
+      <h2>4. Changes to Privacy Policy</h2>
+      <p>Nature's Guardians reserves the right to modify this Privacy Policy at any time. Users will be notified of significant changes through the platform. Continued use of the service after modifications constitutes acceptance of the revised policy.</p>
+
+      <h2>5. Third-Party Services</h2>
+      <p>Our platform may contain links to third-party websites. We do not control these sites and are not responsible for their content or privacy practices. We encourage you to review their privacy policies before providing any personal information.</p>
+
+      <h2>6. Cookies and Tracking Technologies</h2>
+      <p>We may use cookies and tracking technologies to enhance user experience and analyze website traffic. Users can choose to accept or decline cookies through their browser settings. However, declining cookies may prevent you from taking full advantage of the platform.</p>
+
+      <h2>7. Contact Information</h2>
+      <p>If you have any questions regarding this Privacy Policy or our data practices, please contact us at NaturesGuardians1@gmail.com.</p>
+  </div>
+</div>
+
+<!-- The About Us Modal -->
+<div id="aboutUsModal" class="modal">
+  <div class="modal-content">
+      <span class="close" id="closeAboutUs">&times;</span>
+      <h1>About Us</h1>
+      <p>Welcome to Nature's Guardians, a dedicated platform aimed at promoting wildlife conservation and raising awareness about endangered species. Our mission is to harness the power of technology to classify and protect our planet's diverse wildlife.</p>
+      
+      <h3>Our Mission</h3>
+      <p>We strive to utilize advanced machine learning techniques to provide accurate identification of endangered species from images. By doing so, we hope to empower individuals and organizations to take action in conservation efforts.</p>
+      
+      <h3>Our Vision</h3>
+      <p>We envision a world where every individual is aware of the importance of biodiversity and actively participates in conservation initiatives. Through education and engagement, we aim to inspire a collective effort to protect our planet's wildlife.</p>
+      
+      <h3>Our Values</h3>
+      <ul>
+          <li><strong>Integrity:</strong> We uphold the highest ethical standards in our work.</li>
+          <li><strong>Innovation:</strong> We embrace new technologies and ideas to enhance our impact.</li>
+          <li><strong>Collaboration:</strong> We believe in partnerships that drive effective conservation solutions.</li>
+          <li><strong>Education:</strong> We are committed to raising awareness about wildlife conservation.</li>
+      </ul>
+      
+      <p>Join us on our journey to protect the planet's wildlife. Together, we can make a difference!</p>
+  </div>
+</div>
+
+<script>
+    // Function to show modals
+    function showModal(modalId) {
+        document.getElementById(modalId).style.display = 'flex';
+    }
+
+    // Function to close modals
+    function closeModal(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+    }
+
+    // Event listeners for links
+    document.getElementById('termsLink').onclick = function(event) {
+        event.preventDefault();
+        showModal('termsModal');
+    };
+
+    document.getElementById('privacyLink').onclick = function(event) {
+        event.preventDefault();
+        showModal('privacyModal');
+    };
+
+    document.getElementById('aboutUsLink').onclick = function(event) {
+        event.preventDefault();
+        showModal('aboutUsModal');
+    };
+
+    // Close modal when clicking on (x)
+    document.getElementById('closeTerms').onclick = function() {
+        closeModal('termsModal');
+    };
+    document.getElementById('closePrivacy').onclick = function() {
+        closeModal('privacyModal');
+    };
+    document.getElementById('closeAboutUs').onclick = function() {
+        closeModal('aboutUsModal');
+    };
+
+    function showAddModal() {
+        alert('Add user function coming soon!');
+    }
+
+    function showUpdateModal() {
+        alert('Update user function coming soon!');
+    }
+
+    function showDeleteModal() {
+        alert('Delete user function coming soon!');
+    }
+
+    // Close modal when clicking outside of modal content
+    window.onclick = function(event) {
+        if (event.target.classList.contains('modal')) {
+            closeModal('termsModal');
+            closeModal('privacyModal');
+            closeModal('aboutUsModal');
+        }
+    };
+</script>
+
+</body>
+</html>

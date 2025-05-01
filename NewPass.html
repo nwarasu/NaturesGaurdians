@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Password</title>
+    <link rel="stylesheet" href="forgetPass.css">
+    <style>
+        /* Minimal modal styling */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 999;
+            left: 0;
+            top: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.6);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            position: relative;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .modal-content .close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .check-icon {
+            font-size: 48px;
+            color: green;
+            margin-bottom: 15px;
+        }
+
+        .continue-button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            margin-top: 15px;
+            cursor: pointer;
+        }
+
+        .continue-button:hover {
+            background-color: #218838;
+        }
+    </style>
+    <script>
+        function togglePassword(id) {
+            const passwordField = document.getElementById(id);
+            const passwordFieldType = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordField.setAttribute('type', passwordFieldType);
+        }
+
+        function validateAndShowMessage(event) {
+            event.preventDefault();
+
+            const newPassword = document.getElementById('new-password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            const errorMessage = document.getElementById('error-message');
+
+            if (newPassword.length !== 8 || confirmPassword.length !== 8) {
+                errorMessage.textContent = "Both passwords must be 8 characters long.";
+                errorMessage.style.display = "block";
+                return false;
+            }
+
+            if (newPassword !== confirmPassword) {
+                errorMessage.textContent = "Passwords do not match.";
+                errorMessage.style.display = "block";
+                return false;
+            }
+
+            errorMessage.style.display = "none";
+            document.getElementById('successModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('successModal').style.display = 'none';
+            document.getElementById('passwordForm').reset(); // Clear form
+            // Optionally redirect:
+            // window.location.href = 'login.html';
+        }
+    </script>
+</head>
+<body>
+    <div class="newPass-container">
+        <div class="form-section">
+            <h1>New Password</h1>
+            <p>Set the new password for your account so you can login and access all features.</p>
+            <form id="passwordForm" onsubmit="return validateAndShowMessage(event)">
+                <label for="new-password">Enter new password</label>
+                <div class="newPass-container"> 
+                    <input type="password" id="new-password" placeholder="8 symbols at least" maxlength="8" required>
+                    <span class="toggle-password" onclick="togglePassword('new-password')">👁️</span> 
+                </div>
+
+                <label for="confirm-password">Confirm password</label>
+                <div class="newPass-container">
+                    <input type="password" id="confirm-password" placeholder="8 symbols at least" maxlength="8" required>
+                    <span class="toggle-password" onclick="togglePassword('confirm-password')">👁️</span>
+                </div>
+
+                <button type="submit" class="update-button">UPDATE PASSWORD</button>
+                <p id="error-message" style="color: red; display: none;"></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div class="modal-body">
+                <div class="check-icon">✅</div>
+                <h2>Successfully</h2>
+                <p>Your password has been reset successfully.</p>
+                <a href="home.html"> <button  class="continue-button">CONTINUE</button></a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

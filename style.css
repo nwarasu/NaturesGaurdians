@@ -1,0 +1,32 @@
+.sidebar {
+    width: 80px;
+    background: white;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-right: 2px solid #ddd;
+}
+
+.nav-icons {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.nav-icons button {
+    width: 50px;
+    height: 50px;
+    background-size: cover;
+    background-position: center;
+    border: none;
+    cursor: pointer;
+}
+
+.btn1 { background-image: url('images/button1.png'); }
+.btn2 { background-image: url('images/button2.png'); }
+.btn3 { background-image: url('images/button3.png'); }
+.btn4 { background-image: url('images/button4.png'); }
+.btn5 { background-image: url('images/button5.png'); }
+.btn6 { background-image: url('images/button6.png'); }
+.btn7 { background-image: url('images/button7.png'); }
